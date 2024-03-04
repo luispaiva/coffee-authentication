@@ -1,0 +1,25 @@
+{    
+    "files.watcherExclude": {
+      "**/.git/objects/**": true,
+      "**/.git/subtree-cache/**": true,
+      "**/node_modules/*/**": true,
+      "**/.hg/store/**": true,
+      "**/vendor/*/**": true
+    },
+
+    "files.exclude": {
+      "**/.classpath": true,
+      "**/.project": true,
+      "**/.settings": true,
+      "**/.factorypath": true
+    },
+    
+    "php.suggest.basic": false,
+    "phpSniffer.run": "onType",
+    "phpSniffer.autoDetect": true,
+    "phpSniffer.standard": "./phpcs.xml",
+    "[php]": {
+      "editor.defaultFormatter": "wongjn.php-sniffer",
+      "editor.formatOnSave": true
+    },
+  }

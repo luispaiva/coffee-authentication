@@ -1,0 +1,43 @@
+# Copyright (C) 2024 Luis Paiva
+# This file is distributed under the same license as the Coffee - API plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: Coffee - API 1.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/coffee\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2024-02-25T15:53:09+01:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.10.0\n"
+"X-Domain: coffee\n"
+
+#. Plugin Name of the plugin
+#: coffee.php
+msgid "Coffee - API"
+msgstr ""
+
+#. Description of the plugin
+#: coffee.php
+msgid "Um plugin criado para aprendizado de Clean Code, API First."
+msgstr ""
+
+#. Author of the plugin
+#: coffee.php
+msgid "Luis Paiva"
+msgstr ""
+
+#. Author URI of the plugin
+#: coffee.php
+msgid "https://luispaiva.com.br"
+msgstr ""
+
+#: src/Controllers/Auth.php:27
+msgid "Usuário e senha são obrigatórios!"
+msgstr ""
+
+#: src/Controllers/Auth.php:40
+msgid "Usuário ou senhas inválidos!"
+msgstr ""
