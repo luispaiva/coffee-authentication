@@ -1,6 +1,7 @@
 <?php
 /**
- * Plugin Name: Coffee - Authentication
+ * Plugin Name: Coffee - Auth
+ * Plugin URI:  https://github.com/luispaiva/coffee-authentication
  * Author:      Luis Paiva
  * Author URI:  https://luispaiva.com.br
  * Text Domain: coffee
