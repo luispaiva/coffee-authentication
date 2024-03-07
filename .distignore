@@ -1,0 +1,13 @@
+# Directory
+.vscode
+
+# Files
+composer.json
+composer.lock
+phpcs.xml
+LICENSE
+.git
+.gitignore
+.distignore
+README.md
+
