@@ -50,5 +50,24 @@ class Auth extends Route {
 				),
 			)
 		);
+
+		register_rest_route(
+			self::$namespace . '/v1',
+			self::$resource . '/refresh-token',
+			array(
+				'methods'  => \WP_REST_Server::CREATABLE,
+				'callback' => function ( \WP_REST_Request $request ) {
+					return ( new \App\Controllers\Auth() )->refresh( $request );
+				},
+				'args'     => array(
+					'refresh_token' => array(
+						'required'          => true,
+						'description'       => 'The refresh token.',
+						'type'              => 'string',
+						'sanitize_callback' => 'sanitize_text_field',
+					),
+				),
+			)
+		);
 	}
 }
