@@ -22,4 +22,9 @@
       "editor.defaultFormatter": "wongjn.php-sniffer",
       "editor.formatOnSave": true
     },
+    "cSpell.ignoreWords": [
+      "phpcs",
+      "usermeta",
+      "wpdb"
+    ],
   }
