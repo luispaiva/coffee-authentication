@@ -23,6 +23,7 @@
       "editor.formatOnSave": true
     },
     "cSpell.ignoreWords": [
+      "bloginfo",
       "phpcs",
       "usermeta",
       "wpdb"
