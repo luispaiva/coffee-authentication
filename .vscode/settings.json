@@ -24,6 +24,7 @@
     },
     "cSpell.ignoreWords": [
       "bloginfo",
+      "distignore",
       "phpcs",
       "usermeta",
       "wpdb"
