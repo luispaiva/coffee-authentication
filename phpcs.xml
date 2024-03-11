@@ -6,5 +6,6 @@
         <exclude name="WordPress.NamingConventions.ValidFunctionName.MethodNameInvalid"/>
         <exclude name="WordPress.NamingConventions.ValidFunctionName.FunctionNameInvalid"/>
         <exclude name="WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase"/>
+        <exclude name="WordPress.NamingConventions.ValidVariableName.InterpolatedVariableNotSnakeCase"/>
     </rule>
 </ruleset>
