@@ -66,11 +66,7 @@ class Auth {
 		$user         = Token::validateRefreshToken( $refreshToken );
 
 		if ( is_wp_error( $user ) ) {
-			return new \WP_Error(
-				'invalid_refresh_token',
-				esc_html__( 'Refresh token inválido!', 'coffee' ),
-				array( 'status' => 401 )
-			);
+			return new \WP_Error( 'invalid_refresh_token', $user->get_error_message(), array( 'status' => 401 ) );
 		}
 
 		return new \WP_REST_Response( Token::generate( $user ), 200 );
