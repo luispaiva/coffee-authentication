@@ -59,8 +59,6 @@ class Token {
 		return apply_filters( 'jwt_auth_token_before_dispatch', $data, $user );
 	}
 
-
-
 	/**
 	 * Validate token.
 	 *
