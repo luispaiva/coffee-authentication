@@ -46,27 +46,9 @@ class Token {
 			return false;
 		}
 
-		$issued_at  = time();
-		$not_before = apply_filters( 'jwt_auth_not_before', $issued_at, $issued_at );
-		$expire     = apply_filters( 'jwt_auth_token_expire', $issued_at + ( MINUTE_IN_SECONDS * 60 ) );
-		$token      = array(
-			'iss'  => get_bloginfo( 'url' ),
-			'iat'  => $issued_at,
-			'nbf'  => $not_before,
-			'exp'  => $expire,
-			'data' => array(
-				'user' => array(
-					'id' => $user->data->ID,
-				),
-			),
-		);
-
-		$token        = JWT::encode( $token, self::$secret_key, 'HS256' );
-		$refreshToken = wp_generate_uuid4();
-
-		self::setRefreshToken( $user->data->ID, $refreshToken );
-
-		$data = array(
+		$token        = self::getToken( $user->data->ID );
+		$refreshToken = self::getRefreshToken( $user->data->ID );
+		$data         = array(
 			'token'        => $token,
 			'refreshToken' => $refreshToken,
 			'id'           => $user->data->ID,
@@ -76,6 +58,8 @@ class Token {
 
 		return apply_filters( 'jwt_auth_token_before_dispatch', $data, $user );
 	}
+
+
 
 	/**
 	 * Validate token.
@@ -88,7 +72,7 @@ class Token {
 		try {
 			return JWT::decode( $token, new Key( self::$secret_key, 'HS256' ) );
 		} catch ( \Exception $e ) {
-			return new \WP_Error( 'rest_auth_invalid_token', $e->getMessage(), array( 'status' => 403 ) );
+			return new \WP_Error( 'invalid_token', $e->getMessage(), array( 'status' => 403 ) );
 		}
 	}
 
@@ -104,7 +88,7 @@ class Token {
 
 		if ( ! $userId ) {
 			return new \WP_Error(
-				'rest_auth_invalid_refresh_token',
+				'invalid_refresh_token',
 				esc_html__( 'Refresh token inválido!', 'coffee' ),
 				array( 'status' => 403 )
 			);
@@ -114,15 +98,55 @@ class Token {
 	}
 
 	/**
-	 * Refresh token.
+	 * Get token.
 	 *
-	 * @param int    $userId       User ID.
-	 * @param string $refreshToken Refresh token.
+	 * @param mixed $userId User ID.
 	 *
-	 * @return bool
+	 * @return string
 	 */
-	private static function setRefreshToken( $userId, $refreshToken ) {
-		return update_user_meta( $userId, 'refresh_token', $refreshToken );
+	private static function getToken( $userId ) {
+		$issued_at    = time();
+		$not_before   = apply_filters( 'jwt_auth_not_before', $issued_at, $issued_at );
+		$expire       = apply_filters( 'jwt_auth_token_expire', $issued_at + MINUTE_IN_SECONDS * 60 );
+		$refreshToken = array(
+			'iss'  => get_bloginfo( 'url' ),
+			'iat'  => $issued_at,
+			'nbf'  => $not_before,
+			'exp'  => $expire,
+			'data' => array(
+				'user' => array(
+					'id' => $userId,
+				),
+			),
+		);
+
+		return JWT::encode( $refreshToken, self::$secret_key, 'HS256' );
+	}
+
+	/**
+	 * Get refresh token.
+	 *
+	 * @param mixed $userId User ID.
+	 *
+	 * @return string
+	 */
+	private static function getRefreshToken( $userId ) {
+		$issued_at    = time();
+		$not_before   = apply_filters( 'jwt_auth_refresh_token_not_before', $issued_at, $issued_at );
+		$expire       = apply_filters( 'jwt_auth_refresh_token_expire', $issued_at + DAY_IN_SECONDS * 60 );
+		$refreshToken = array(
+			'iss'  => get_bloginfo( 'url' ),
+			'iat'  => $issued_at,
+			'nbf'  => $not_before,
+			'exp'  => $expire,
+			'data' => array(
+				'user' => array(
+					'id' => $userId,
+				),
+			),
+		);
+
+		return JWT::encode( $refreshToken, self::$secret_key, 'HS256' );
 	}
 
 	/**
@@ -130,27 +154,15 @@ class Token {
 	 *
 	 * @param string $refreshToken Refresh token.
 	 *
-	 * @return int
+	 * @return bool|int
 	 */
 	private static function getUserIdByRefreshToken( $refreshToken ) {
-		global $wpdb;
+		$refreshToken = self::validate( $refreshToken );
 
-		$cache_key = 'refresh_token_' . $refreshToken;
-		$userId    = wp_cache_get( $cache_key, 'refresh_token' );
-
-		if ( false !== $userId ) {
-			return (int) $userId;
+		if ( is_wp_error( $refreshToken ) ) {
+			return false;
 		}
 
-		$userId = $wpdb->get_var( //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
-			$wpdb->prepare(
-				"SELECT user_id FROM $wpdb->usermeta WHERE meta_key = 'refresh_token' AND meta_value = %s",
-				$refreshToken
-			)
-		);
-
-		wp_cache_set( $cache_key, $userId, 'refresh_token' );
-
-		return (int) $userId;
+		return (int) $refreshToken->data->user->id;
 	}
 }
