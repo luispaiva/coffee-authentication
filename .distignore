@@ -10,4 +10,5 @@ LICENSE
 .gitignore
 .distignore
 README.md
-
+.phpunit.cache
+.phpunit.result.cache
