@@ -16,9 +16,11 @@
     "firebase/php-jwt": "^6.10"
   },
   "require-dev": {
-    "wp-cli/i18n-command": "^2.6"
+    "wp-cli/i18n-command": "^2.6",
+    "phpunit/phpunit": "^10"
   },
   "scripts": {
-    "make-pot": "wp i18n make-pot . languages/coffee.pot"
+    "make-pot": "wp i18n make-pot . languages/coffee.pot",
+    "phpunit": "./vendor/bin/phpunit --colors"
   }
 }
