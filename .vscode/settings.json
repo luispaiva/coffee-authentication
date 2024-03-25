@@ -23,9 +23,12 @@
       "editor.formatOnSave": true
     },
     "cSpell.ignoreWords": [
+      "ABSPATH",
+      "autoloader",
       "bloginfo",
       "distignore",
       "phpcs",
+      "pluggable",
       "usermeta",
       "wpdb"
     ],
