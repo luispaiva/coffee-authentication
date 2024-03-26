@@ -21,6 +21,6 @@
   },
   "scripts": {
     "make-pot": "wp i18n make-pot . languages/coffee.pot",
-    "phpunit": "./vendor/bin/phpunit --colors"
+    "phpunit": "./vendor/bin/phpunit"
   }
 }
