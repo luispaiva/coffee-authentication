@@ -20,28 +20,35 @@ final class AuthTest extends TestCase {
 	 *
 	 * @var int
 	 */
-	private static $user_id;
+	private static $userId;
 
 	/**
 	 * Username.
 	 *
 	 * @var string
 	 */
-	private static $username = 'userTest';
+	private static $username;
 
 	/**
 	 * Password.
 	 *
 	 * @var string
 	 */
-	private static $password = 'userTest';
+	private static $password;
 
 	/**
 	 * Email.
 	 *
 	 * @var string
 	 */
-	private static $email = 'user@test.com';
+	private static $email;
+
+	/**
+	 * Refresh token.
+	 *
+	 * @var string
+	 */
+	private static $refreshToken;
 
 	/**
 	 * Set up before auth.
@@ -49,7 +56,11 @@ final class AuthTest extends TestCase {
 	 * @return void
 	 */
 	public static function setUpBeforeClass(): void {
-		self::$user_id = wp_create_user( self::$username, self::$password, self::$email );
+		$uuid           = wp_generate_uuid4();
+		self::$username = $uuid;
+		self::$password = $uuid;
+		self::$email    = $uuid . '@test.com';
+		self::$userId   = wp_create_user( self::$username, self::$password, self::$email );
 	}
 
 	/**
@@ -63,7 +74,7 @@ final class AuthTest extends TestCase {
 
 		// Load the pluggable functions.
 		require_once ABSPATH . 'wp-includes/pluggable.php';
-		\wp_delete_user( self::$user_id );
+		\wp_delete_user( self::$userId );
 	}
 
 	/**
@@ -71,7 +82,7 @@ final class AuthTest extends TestCase {
 	 *
 	 * @return void
 	 */
-	public function testFailLogin() {
+	public function testFailLogin(): void {
 		$auth    = new Auth();
 		$request = new \WP_REST_Request();
 
@@ -91,7 +102,7 @@ final class AuthTest extends TestCase {
 	 *
 	 * @return void
 	 */
-	public function testSuccessLogin() {
+	public function testSuccessLogin(): void {
 		$auth    = new Auth();
 		$request = new \WP_REST_Request();
 
@@ -103,11 +114,77 @@ final class AuthTest extends TestCase {
 		$this->assertInstanceOf( 'WP_REST_Response', $response );
 		$this->assertEquals( 200, $response->get_status() );
 		$this->assertJson( wp_json_encode( $response->data ) );
+
 		$this->assertArrayHasKey( 'token', $response->data );
 		$this->assertArrayHasKey( 'refreshToken', $response->data );
 		$this->assertArrayHasKey( 'id', $response->data );
 		$this->assertArrayHasKey( 'name', $response->data );
 		$this->assertArrayHasKey( 'email', $response->data );
-		$this->assertTrue( (int) $response->data['id'] === self::$user_id );
+
+		self::$refreshToken = $response->data['refreshToken'];
+		$this->assertTrue( (int) $response->data['id'] === self::$userId );
+	}
+
+	/**
+	 * Test not found refresh token.
+	 *
+	 * @return void
+	 */
+	public function testNotFoundRefreshToken(): void {
+		$auth    = new Auth();
+		$request = new \WP_REST_Request();
+
+		$request->set_param( 'refresh_token', null );
+
+		$response = $auth->refresh( $request );
+
+		$this->assertInstanceOf( 'WP_Error', $response );
+		$this->assertEquals( 'required_params', $response->get_error_code() );
+		$this->assertEquals( 'O refresh token é obrigatório!', $response->get_error_message() );
+		$this->assertTrue( $response->has_errors(), 'true' );
+	}
+
+	/**
+	 * Test invalid refresh token.
+	 *
+	 * @return void
+	 */
+	public function testInvalidRefreshToken(): void {
+		$auth    = new Auth();
+		$request = new \WP_REST_Request();
+
+		$request->set_param( 'refresh_token', 'invalid_refresh_token' );
+
+		$response = $auth->refresh( $request );
+
+		$this->assertInstanceOf( 'WP_Error', $response );
+		$this->assertEquals( 'invalid_refresh_token', $response->get_error_code() );
+		$this->assertEquals( 'Refresh token inválido!', $response->get_error_message() );
+		$this->assertTrue( $response->has_errors(), 'true' );
+	}
+
+	/**
+	 * Test success refresh token.
+	 *
+	 * @depends testSuccessLogin
+	 * @return void
+	 */
+	public function testSuccessRefreshToken(): void {
+		$auth    = new Auth();
+		$request = new \WP_REST_Request();
+
+		$request->set_param( 'refresh_token', self::$refreshToken );
+
+		$response = $auth->refresh( $request );
+
+		$this->assertInstanceOf( 'WP_REST_Response', $response );
+		$this->assertEquals( 200, $response->get_status() );
+		$this->assertJson( wp_json_encode( $response->data ) );
+		$this->assertArrayHasKey( 'token', $response->data );
+		$this->assertArrayHasKey( 'refreshToken', $response->data );
+		$this->assertArrayHasKey( 'id', $response->data );
+		$this->assertArrayHasKey( 'name', $response->data );
+		$this->assertArrayHasKey( 'email', $response->data );
+		$this->assertTrue( (int) $response->data['id'] === self::$userId );
 	}
 }
